@@ -22,3 +22,5 @@ debug/
 *.sln
 *.suo
 *.vcxproj*
+*~
+.build/
