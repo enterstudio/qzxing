@@ -48,8 +48,8 @@ ApplicationWindow
     {
         id:camera
         focus {
-            focusMode: CameraFocus.FocusContinuous
-            focusPointMode: CameraFocus.FocusPointAuto
+            focusMode: Camera.FocusContinuous
+            focusPointMode: Camera.FocusPointCenter
         }
     }
 
