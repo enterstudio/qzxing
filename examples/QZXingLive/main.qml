@@ -35,6 +35,10 @@ ApplicationWindow
     Camera
     {
         id:camera
+        focus {
+            focusMode: Camera.FocusContinuous
+            focusPointMode: Camera.FocusPointCenter
+        }
     }
 
     VideoOutput
@@ -45,7 +49,7 @@ ApplicationWindow
         anchors.bottom: text2.top
         anchors.left: parent.left
         anchors.right: parent.right
-     //   autoOrientation: true
+        autoOrientation: true
         filters: [ zxingFilter ]
     }
 
