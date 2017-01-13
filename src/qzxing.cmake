@@ -140,7 +140,7 @@ set(QZXING_HEADERS
 set(QZXING_SOURCES
   ${PWD}/CameraImageWrapper.cpp
   ${PWD}/QZXingImageProvider.cpp
-  ${PWD}/qzxing.cpp
+  ${PWD}/QZXing.cpp
   ${PWD}/imagehandler.cpp
   ${PWD}/zxing/zxing/ResultIO.cpp
   ${PWD}/zxing/zxing/InvertedLuminanceSource.cpp
