@@ -9,7 +9,7 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Quick REQUIRED)
 
-set(LIBRARIES
+set(QZXING_LIBRARIES
   Qt5::Core
   Qt5::Gui
   Qt5::Widgets
