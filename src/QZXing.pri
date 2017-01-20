@@ -5,13 +5,14 @@ CONFIG += qzxing_qml
 DEFINES += QZXING_LIBRARY \
         ZXING_ICONV_CONST \
         DISABLE_LIBRARY_FEATURES
-		 
+
 INCLUDEPATH  += $$PWD \
                 $$PWD/zxing
 
 HEADERS += $$PWD/QZXing_global.h \
     $$PWD/CameraImageWrapper.h \
     $$PWD/ImageHandler.h \
+    $$PWD/Logging.h \
     $$PWD/QZXing.h \
     $$PWD/zxing/zxing/ZXing.h \
     $$PWD/zxing/zxing/IllegalStateException.h \
@@ -137,6 +138,7 @@ HEADERS += $$PWD/QZXing_global.h \
 SOURCES += $$PWD/CameraImageWrapper.cpp \
     $$PWD/QZXing.cpp \
     $$PWD/ImageHandler.cpp \
+    $$PWD/Logging.cpp \
     $$PWD/zxing/zxing/ResultIO.cpp \
     $$PWD/zxing/zxing/InvertedLuminanceSource.cpp \
     $$PWD/zxing/zxing/ChecksumException.cpp \

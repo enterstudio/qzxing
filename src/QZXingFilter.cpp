@@ -1,8 +1,9 @@
 #include "QZXingFilter.h"
 
 #include <QZXing.h>
-#include <QDebug>
 #include <QtConcurrent/QtConcurrent>
+
+#include "Logging.h"
 
 namespace {
     uchar gray(uchar r, uchar g, uchar b)
@@ -29,6 +30,7 @@ QZXingFilter::QZXingFilter(QObject *parent)
     : QAbstractVideoFilter(parent)
     , decoder_p(new QZXing())
     , decoding(false)
+    , isTracingFrames(false)
 {
     /// Conecting signals to handlers that will send signals to QML
     connect(decoder_p, &QZXing::decodingStarted,
@@ -169,6 +171,14 @@ static QImage rgbDataToGrayscale(const uchar* data, const int width, const int h
     return image;
 }
 
+#define TRACEIMAGE(label, force) { \
+  if (force || filter->isTracingFrames) { \
+    const QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation) + \
+      "/qrtest/test_" + QString::number(i) + "_" + label + ".png"; \
+    QZX_FILTER_INFO << "saving image" << i << "at:" << path << image.save(path); \
+  } \
+}
+
 void QZXingFilterRunnable::processVideoFrameProbed(SimpleVideoFrame & videoFrame, const QRect& captureRect)
 {
     static unsigned int i = 0; i++;
@@ -256,10 +266,10 @@ void QZXingFilterRunnable::processVideoFrameProbed(SimpleVideoFrame & videoFrame
 
     if(image.isNull())
     {
-        qDebug() << "QZXingFilterRunnable error: Cant create image file to process.";
-        qDebug() << "Maybe it was a format conversion problem? ";
-        qDebug() << "VideoFrame format: " << videoFrame.pixelFormat;
-        qDebug() << "Image corresponding format: " << QVideoFrame::imageFormatFromPixelFormat(videoFrame.pixelFormat);
+        QZX_FILTER_WARN << "QZXingFilterRunnable error: Cant create image file to process.";
+        QZX_FILTER_WARN << "Maybe it was a format conversion problem? ";
+        QZX_FILTER_WARN << "VideoFrame format: " << videoFrame.pixelFormat;
+        QZX_FILTER_WARN << "Image corresponding format: " << QVideoFrame::imageFormatFromPixelFormat(videoFrame.pixelFormat);
         filter->decoding = false;
         return;
     }
@@ -271,9 +281,7 @@ void QZXingFilterRunnable::processVideoFrameProbed(SimpleVideoFrame & videoFrame
 //    qDebug() << "image.format()" << image.format();
 //    qDebug() << "videoFrame.pixelFormat" << videoFrame.pixelFormat;
 
-//    const QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation) + "/qrtest/test_" + QString::number(i % 100) + ".png";
-//    qDebug() << "saving image" << i << "at:" << path << image.save(path);
-
+    TRACEIMAGE("original", false);
     QString tag = decode(image);
 
     const bool tryHarder = filter->decoder_p->getTryHarder();

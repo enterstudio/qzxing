@@ -5,19 +5,21 @@
 #include <zxing/BinaryBitmap.h>
 #include <zxing/MultiFormatReader.h>
 #include <zxing/DecodeHints.h>
-#include "CameraImageWrapper.h"
-#include "ImageHandler.h"
-#include <QTime>
-#include <QUrl>
-#include <QFileInfo>
 #include <zxing/qrcode/encoder/Encoder.h>
 #include <zxing/qrcode/ErrorCorrectionLevel.h>
 #include <zxing/common/detector/WhiteRectangleDetector.h>
-#include <QColor>
 
+#include <QTime>
+#include <QUrl>
+#include <QFileInfo>
+#include <QColor>
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQuickImageProvider>
+
+#include "CameraImageWrapper.h"
+#include "Logging.h"
+#include "ImageHandler.h"
 
 using namespace zxing;
 
@@ -302,7 +304,10 @@ QString QZXing::decodeImage(const QImage &image, int maxWidth, int maxHeight, bo
         try {
             res = decoder->decode(bb, hints);
             hasSucceded = true;
-        }catch(zxing::Exception &e){}
+            QZX_DEBUG << "initial try succeeded!";
+        } catch(zxing::Exception &e){
+            QZX_DEBUG << "initial try FAILED!";
+        }
 
         if(!hasSucceded)
         {
@@ -311,20 +316,28 @@ QString QZXing::decodeImage(const QImage &image, int maxWidth, int maxHeight, bo
             try {
                 res = decoder->decode(bb, hints);
                 hasSucceded = true;
-            } catch(zxing::Exception &e) {}
+                QZX_DEBUG << "initial tryHarder succeeded!";
+            } catch(zxing::Exception &e) {
+                QZX_DEBUG << "initial tryHarder FAILED!";
+            }
 
             if (tryHarder_ && bb->isRotateSupported()) {
                 Ref<BinaryBitmap> bbTmp = bb;
 
+                QZX_DEBUG << "Lets try even harder (rotating)...";
                 for (int i=0; (i<3 && !hasSucceded); i++) {
-                    Ref<BinaryBitmap> rotatedImage(bbTmp->rotateCounterClockwise());
-                    bbTmp = rotatedImage;
-
                     try {
+                        Ref<BinaryBitmap> rotatedImage(bbTmp->rotateCounterClockwise());
+                        bbTmp = rotatedImage;
+                        QZX_DEBUG << "tryHarder" << i << ": rotated " << (i+1)*90 << " degrees";
+
                         res = decoder->decode(rotatedImage, hints);
+                        QZX_DEBUG << "tryHarder " << i << " succeeded!";
                         processingTime = t.elapsed();
                         hasSucceded = true;
-                    } catch(zxing::Exception &e) {}
+                    } catch(zxing::Exception &e) {
+                        QZX_DEBUG << "tryHarder " << i << " FAILED (" << e.what() << ")!";
+                    }
                 }
             }
         }
@@ -422,7 +435,7 @@ QString QZXing::decodeSubImageQML(const QUrl &imageUrl,
     } else {
         QFileInfo fileInfo(imagePath);
         if (!fileInfo.exists()) {
-            qDebug() << "[decodeSubImageQML()] The file" << imagePath << "does not exist.";
+            QZX_DEBUG << "[decodeSubImageQML()] The file" << imagePath << "does not exist.";
             emit decodingFinished(false);
             return "";
         }

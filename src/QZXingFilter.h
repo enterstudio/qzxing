@@ -65,6 +65,7 @@ class QZXingFilter : public QAbstractVideoFilter
         Q_PROPERTY(bool decoding READ isDecoding NOTIFY isDecodingChanged)
         Q_PROPERTY(QZXing* decoder READ getDecoder)
         Q_PROPERTY(QRectF captureRect MEMBER captureRect NOTIFY captureRectChanged)
+        Q_PROPERTY(bool isTracingFrames MEMBER isTracingFrames)
 
     signals:
         void isDecodingChanged();
@@ -83,6 +84,7 @@ class QZXingFilter : public QAbstractVideoFilter
 
         SimpleVideoFrame frame;
         QFuture<void> processThread;
+        bool isTracingFrames;
 
     public:  /// Methods
         explicit QZXingFilter(QObject *parent = 0);
